@@ -8,7 +8,14 @@ use Illuminate\Http\Request;
 class TasksController extends Controller
 {
     public function index(){
-        return view('tasks.index');
+
+        $tasks = Task::orderBy('completed_at', 'DESC')
+        ->orderBy('id', 'DESC')
+        ->get();
+
+        return view('tasks.index', [
+            'tasks' => $tasks,
+        ]);
     }
 
     public function create(){
@@ -16,9 +23,18 @@ class TasksController extends Controller
     }
 
     public function store(){
-        $task = Task::create([
+        Task::create([
             'description' => request('description'),
         ]);
-        return dd($task);
+        return redirect('/');
+    }
+
+    public function update($id){
+        $task = Task::where('id', $id)->first();
+
+        $task->completed_at = now();
+        $task->save();
+
+        return redirect('/');
     }
 }
